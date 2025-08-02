@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Registrar Pago</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+    <h1>Registrar Pago</h1>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 th:text="${trabajo.descripcion}"></h5>
+            <p>Cliente: <span th:text="${trabajo.clienteNombre}"></span></p>
+            <p>Monto total: <span th:text="${#numbers.formatCurrency(trabajo.monto)}"></span></p>
+            <p>Pagado: <span th:text="${#numbers.formatCurrency(pagado)}"></span></p>
+            <p>Pendiente: <span th:text="${#numbers.formatCurrency(trabajo.monto - pagado)}"></span></p>
+        </div>
+    </div>
+
+    <form th:action="@{'/trabajos/' + ${trabajo.id} + '/pagos'}" method="post">
+        <div class="mb-3">
+            <label for="monto" class="form-label">Monto a pagar</label>
+            <input type="number" step="0.01" class="form-control" id="monto"
+                   name="monto" th:max="${trabajo.monto - pagado}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Registrar Pago</button>
+        <a th:href="@{'/trabajos'}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+</body>
+</html>

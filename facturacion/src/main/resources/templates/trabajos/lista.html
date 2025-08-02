@@ -8,6 +8,44 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 </head>
 <body>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="get" class="row g-3">
+      <div class="col-md-3">
+        <select name="estado" class="form-select" onchange="this.form.submit()">
+          <option value="">Todos los estados</option>
+          <option th:each="estado : ${estadosPago}"
+                  th:value="${estado}"
+                  th:text="${estado.descripcion}"
+                  th:selected="${param.estado != null and param.estado == estado}">
+          </option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select name="clienteId" class="form-select" onchange="this.form.submit()">
+          <option value="">Todos los clientes</option>
+          <option th:each="cliente : ${clientes}"
+                  th:value="${cliente.id}"
+                  th:text="${cliente.nombre}"
+                  th:selected="${param.clienteId == cliente.id.toString()}">
+          </option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <div class="d-flex justify-content-end gap-2">
+          <a href="/" class="btn btn-info text-white">
+            <i class="bi bi-house-door"></i> Inicio
+          </a>
+          <a href="/trabajos/nuevo" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Nuevo Trabajo
+          </a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div class="container mt-4">
   <h1 class="mb-4">Trabajos</h1>
 

@@ -18,6 +18,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import java.util.ArrayList;
+import java.util.List;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -45,7 +49,8 @@ public class Trabajo {
     private LocalDate fechaTrabajo;
 
     @NotNull(message = "La fecha de vencimiento es requerida")
-    @FutureOrPresent(message = "La fecha de vencimiento debe ser hoy o en el futuro")
+    @FutureOrPresent(message = "La fecha de vencimiento debe ser hoy o en el futuro",
+            groups = OnCreate.class) // Solo validar al crear
     private LocalDate fechaVencimiento;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -53,4 +58,13 @@ public class Trabajo {
     private Cliente cliente;
 
     private String notas;
+
+    @NotNull(message = "La fecha de pago es requerida")
+    private LocalDate fechaPago;
+
+    @OneToMany(mappedBy = "trabajo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Pago> pagos = new ArrayList<>();
+
+    public interface OnCreate {}
+
 }

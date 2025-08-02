@@ -1,4 +1,5 @@
 -- Creación de tablas
+-- V1__init.sql
 CREATE TABLE clientes (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,

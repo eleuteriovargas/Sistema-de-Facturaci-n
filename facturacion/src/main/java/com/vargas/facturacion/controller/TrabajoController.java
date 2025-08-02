@@ -7,7 +7,9 @@ import com.vargas.facturacion.repository.ClienteRepository;
 import com.vargas.facturacion.service.interfaces.ClienteService;
 import com.vargas.facturacion.service.interfaces.TrabajoService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMin;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
@@ -16,12 +18,14 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
 @Controller
 @RequestMapping("/trabajos")
 @RequiredArgsConstructor
+@Slf4j
 public class TrabajoController {
 
     private final TrabajoService trabajoService;
@@ -85,8 +89,51 @@ public class TrabajoController {
             trabajoService.cambiarEstadoPago(id, estado);
             redirectAttributes.addFlashAttribute("success", "Estado actualizado exitosamente");
         } catch (Exception e) {
+            log.error("Error al cambiar estado del trabajo ID: {}", id, e);
+            redirectAttributes.addFlashAttribute("error",
+                    "No se pudo actualizar el estado: " +
+                            (e.getCause() != null ? e.getCause().getMessage() : e.getMessage()));
+        }
+        return "redirect:/trabajos";
+    }
+
+    // Agregar método
+    @PostMapping("/{id}/pagos")
+    public String registrarPago(
+            @PathVariable Long id,
+            @RequestParam @DecimalMin("0.01") BigDecimal monto,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            trabajoService.registrarPago(id, monto);
+            redirectAttributes.addFlashAttribute("success", "Pago registrado exitosamente");
+        } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
         return "redirect:/trabajos";
     }
+
+    @PostMapping("/{id}/pagar")
+    public String registrarPagoCompleto(
+            @PathVariable Long id,
+            @RequestParam(required = false) BigDecimal monto,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            if (monto == null) {
+                // Si no se especifica monto, pagar el total
+                trabajoService.cambiarEstadoPago(id, EstadoPago.PAGADO);
+            } else {
+                // Lógica para pagos parciales
+                trabajoService.registrarPago(id, monto);
+            }
+
+            redirectAttributes.addFlashAttribute("success", "Pago registrado exitosamente");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error",
+                    "Error al registrar pago: " + e.getMessage());
+        }
+        return "redirect:/trabajos";
+    }
+
 }

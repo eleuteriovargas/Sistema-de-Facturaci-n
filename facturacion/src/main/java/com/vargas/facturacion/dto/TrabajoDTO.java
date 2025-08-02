@@ -1,5 +1,6 @@
 package com.vargas.facturacion.dto;
 
+import com.vargas.facturacion.model.entity.Trabajo;
 import com.vargas.facturacion.model.enums.EstadoPago;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.FutureOrPresent;
@@ -28,9 +29,10 @@ public class TrabajoDTO {
     @NotNull
     private LocalDate fechaTrabajo;
 
-    @NotNull
-    @FutureOrPresent
+    @NotNull(groups = Trabajo.OnCreate.class)
+    @FutureOrPresent(groups = Trabajo.OnCreate.class)
     private LocalDate fechaVencimiento;
+    public interface OnCreate {}
 
     @NotNull
     private Long clienteId;

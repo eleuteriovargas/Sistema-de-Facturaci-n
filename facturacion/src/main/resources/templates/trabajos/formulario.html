@@ -10,6 +10,21 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 </head>
 <body>
+
+<div class="col-12 mt-3">
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save"></i> Guardar
+        </button>
+        <a href="/" class="btn btn-info text-white">
+            <i class="bi bi-house-door"></i> Inicio
+        </a>
+        <a th:href="@{/trabajos}" class="btn btn-secondary">
+            <i class="bi bi-x-circle"></i> Cancelar
+        </a>
+    </div>
+</div>
+
 <div class="container mt-4">
     <h1 class="mb-4">Nuevo Trabajo</h1> <!-- Simplificado -->
 
