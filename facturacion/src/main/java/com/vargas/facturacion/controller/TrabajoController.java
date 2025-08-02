@@ -1,8 +1,10 @@
 package com.vargas.facturacion.controller;
 
 import com.vargas.facturacion.dto.TrabajoDTO;
+import com.vargas.facturacion.model.entity.Trabajo;
 import com.vargas.facturacion.model.enums.EstadoPago;
 import com.vargas.facturacion.repository.ClienteRepository;
+import com.vargas.facturacion.service.interfaces.ClienteService;
 import com.vargas.facturacion.service.interfaces.TrabajoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -23,6 +26,8 @@ public class TrabajoController {
 
     private final TrabajoService trabajoService;
     private final ClienteRepository clienteRepository;
+    private final ClienteService clienteService;
+
 
     @GetMapping
     public String listarTrabajos(
@@ -40,9 +45,13 @@ public class TrabajoController {
 
     @GetMapping("/nuevo")
     public String mostrarFormularioNuevo(Model model) {
-        if (!model.containsAttribute("trabajo")) {
-            model.addAttribute("trabajo", new TrabajoDTO());
-        }
+        TrabajoDTO trabajo = new TrabajoDTO();
+        trabajo.setEstadoPago(EstadoPago.PENDIENTE); // Establecer valor por defecto
+        trabajo.setFechaTrabajo(LocalDate.now());
+        trabajo.setFechaVencimiento(LocalDate.now().plusDays(7));
+
+
+        model.addAttribute("trabajo", trabajo);
         model.addAttribute("clientes", clienteRepository.findAll());
         return "trabajos/formulario";
     }

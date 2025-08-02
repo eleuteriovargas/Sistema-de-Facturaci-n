@@ -21,7 +21,7 @@ public class TrabajoDTO {
 
     @NotNull
     @DecimalMin("0.01")
-    private BigDecimal monto;
+    private BigDecimal monto = BigDecimal.ZERO;
 
     private EstadoPago estadoPago = EstadoPago.PENDIENTE;
 
@@ -37,5 +37,5 @@ public class TrabajoDTO {
 
     private String clienteNombre;
 
-    private String notas;
+    private String notas = "";
 }

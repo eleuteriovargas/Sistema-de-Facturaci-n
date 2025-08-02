@@ -1,33 +1,28 @@
+
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title th:text="${trabajo.id != null} ? 'Editar Trabajo' : 'Nuevo Trabajo'"></title>
+    <title>Lista de Trabajos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 </head>
 <body>
 <div class="container mt-4">
-    <h1 class="mb-4" th:text="${trabajo.id != null} ? 'Editar Trabajo' : 'Nuevo Trabajo'"></h1>
+    <h1 class="mb-4">Nuevo Trabajo</h1> <!-- Simplificado -->
 
-    <!-- Mensajes de error -->
-    <div th:if="${#fields.hasErrors('*')}" class="alert alert-danger">
-        <ul>
-            <li th:each="err : ${#fields.errors('*')}" th:text="${err}"></li>
-        </ul>
-    </div>
-
-    <form th:action="@{/trabajos}" th:object="${trabajo}" method="post">
-        <input type="hidden" th:field="*{id}">
-
+    <!-- Formulario corregido -->
+    <form th:action="@{/trabajos}" method="post" th:object="${trabajo}">
         <div class="row g-3">
             <!-- Descripción -->
             <div class="col-md-12">
                 <label for="descripcion" class="form-label">Descripción</label>
-                <input type="text" class="form-control" id="descripcion" th:field="*{descripcion}"
-                       placeholder="Descripción del trabajo">
-                <div class="text-danger" th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}"></div>
+                <input type="text" class="form-control" id="descripcion"
+                       th:field="*{descripcion}" placeholder="Descripción del trabajo">
+                <small class="text-danger" th:if="${#fields.hasErrors('descripcion')}"
+                       th:errors="*{descripcion}"></small>
             </div>
 
             <!-- Monto -->
@@ -35,13 +30,14 @@
                 <label for="monto" class="form-label">Monto</label>
                 <div class="input-group">
                     <span class="input-group-text">$</span>
-                    <input type="number" step="0.01" class="form-control" id="monto" th:field="*{monto}"
-                           placeholder="0.00" min="0.01">
+                    <input type="number" step="0.01" class="form-control" id="monto"
+                           th:field="*{monto}" placeholder="0.00" min="0.01">
                 </div>
-                <div class="text-danger" th:if="${#fields.hasErrors('monto')}" th:errors="*{monto}"></div>
+                <small class="text-danger" th:if="${#fields.hasErrors('monto')}"
+                       th:errors="*{monto}"></small>
             </div>
 
-            <!-- Estado de Pago -->
+            <!-- Estado de Pago (simplificado) -->
             <div class="col-md-6">
                 <label for="estadoPago" class="form-label">Estado de Pago</label>
                 <select class="form-select" id="estadoPago" th:field="*{estadoPago}">
@@ -50,20 +46,17 @@
                             th:text="${estado.descripcion}">
                     </option>
                 </select>
-                <div class="text-danger" th:if="${#fields.hasErrors('estadoPago')}" th:errors="*{estadoPago}"></div>
             </div>
 
             <!-- Fechas -->
             <div class="col-md-6">
                 <label for="fechaTrabajo" class="form-label">Fecha de Trabajo</label>
                 <input type="date" class="form-control" id="fechaTrabajo" th:field="*{fechaTrabajo}">
-                <div class="text-danger" th:if="${#fields.hasErrors('fechaTrabajo')}" th:errors="*{fechaTrabajo}"></div>
             </div>
 
             <div class="col-md-6">
                 <label for="fechaVencimiento" class="form-label">Fecha de Vencimiento</label>
                 <input type="date" class="form-control" id="fechaVencimiento" th:field="*{fechaVencimiento}">
-                <div class="text-danger" th:if="${#fields.hasErrors('fechaVencimiento')}" th:errors="*{fechaVencimiento}"></div>
             </div>
 
             <!-- Cliente -->
@@ -73,17 +66,9 @@
                     <option value="">Seleccione un cliente</option>
                     <option th:each="cliente : ${clientes}"
                             th:value="${cliente.id}"
-                            th:text="${cliente.nombre}"
-                            th:selected="${trabajo.clienteId == cliente.id}">
+                            th:text="${cliente.nombre}">
                     </option>
                 </select>
-                <div class="text-danger" th:if="${#fields.hasErrors('clienteId')}" th:errors="*{clienteId}"></div>
-            </div>
-
-            <!-- Notas -->
-            <div class="col-md-6">
-                <label for="notas" class="form-label">Notas</label>
-                <textarea class="form-control" id="notas" th:field="*{notas}" rows="2"></textarea>
             </div>
 
             <!-- Botones -->
@@ -98,7 +83,6 @@
         </div>
     </form>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
