@@ -59,7 +59,7 @@ public class Trabajo {
 
     private String notas;
 
-    @NotNull(message = "La fecha de pago es requerida")
+    //@NotNull(message = "La fecha de pago es requerida")
     private LocalDate fechaPago;
 
     @OneToMany(mappedBy = "trabajo", cascade = CascadeType.ALL, orphanRemoval = true)

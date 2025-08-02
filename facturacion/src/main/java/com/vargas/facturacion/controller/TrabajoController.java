@@ -1,6 +1,7 @@
 package com.vargas.facturacion.controller;
 
 import com.vargas.facturacion.dto.TrabajoDTO;
+import com.vargas.facturacion.exception.BusinessException;
 import com.vargas.facturacion.model.entity.Trabajo;
 import com.vargas.facturacion.model.enums.EstadoPago;
 import com.vargas.facturacion.repository.ClienteRepository;
@@ -86,14 +87,33 @@ public class TrabajoController {
             RedirectAttributes redirectAttributes) {
 
         try {
-            trabajoService.cambiarEstadoPago(id, estado);
-            redirectAttributes.addFlashAttribute("success", "Estado actualizado exitosamente");
+            TrabajoDTO trabajoActual = trabajoService.obtenerPorId(id);
+
+            // Mostrar mensaje especial si ya está pagado
+            if (trabajoActual.getEstadoPago() == EstadoPago.PAGADO) {
+                redirectAttributes.addFlashAttribute("warning",
+                        "Este trabajo ya está pagado y no puede modificarse");
+                return "redirect:/trabajos";
+            }
+
+            TrabajoDTO trabajoActualizado = trabajoService.cambiarEstadoPago(id, estado);
+
+            if (trabajoActualizado.getEstadoPago() == EstadoPago.PAGADO) {
+                redirectAttributes.addFlashAttribute("success",
+                        "Trabajo marcado como pagado exitosamente");
+            } else {
+                redirectAttributes.addFlashAttribute("success",
+                        "Estado actualizado a " + estado.getDescripcion());
+            }
+        } catch (BusinessException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            log.warn("Intento de modificar trabajo pagado - ID: {}", id);
         } catch (Exception e) {
-            log.error("Error al cambiar estado del trabajo ID: {}", id, e);
             redirectAttributes.addFlashAttribute("error",
-                    "No se pudo actualizar el estado: " +
-                            (e.getCause() != null ? e.getCause().getMessage() : e.getMessage()));
+                    "Error al actualizar estado: " + e.getMessage());
+            log.error("Error al cambiar estado del trabajo ID: {}", id, e);
         }
+
         return "redirect:/trabajos";
     }
 

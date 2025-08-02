@@ -103,28 +103,26 @@ public class TrabajoServiceImpl implements TrabajoService {
         Trabajo trabajo = trabajoRepository.findByIdWithLock(idTrabajo)
                 .orElseThrow(() -> new ResourceNotFoundException("Trabajo no encontrado"));
 
-        // Desactivar validación para fechas vencidas al pagar
-        if (nuevoEstado == EstadoPago.PAGADO && trabajo.getFechaVencimiento().isBefore(LocalDate.now())) {
-            // Guardar sin validación de fecha vencida
-            trabajo.setEstadoPago(EstadoPago.PAGADO);
-            trabajo.setFechaPago(LocalDate.now());
-
-            // Registrar pago
-            Pago pago = new Pago();
-            pago.setMonto(trabajo.getMonto());
-            pago.setFechaPago(LocalDate.now());
-            pago.setTrabajo(trabajo);
-            pagoRepository.save(pago);
-
-            // Guardar sin validación
-            trabajoRepository.saveAndFlush(trabajo);
-            return trabajoMapper.toDTO(trabajo);
+        // Validar si ya está pagado
+        if (trabajo.getEstadoPago() == EstadoPago.PAGADO) {
+            throw new BusinessException("No se puede modificar el estado de un trabajo ya pagado");
         }
 
-        // Lógica normal para otros casos
-        trabajo.setEstadoPago(nuevoEstado);
+        // Validar transiciones permitidas
+        if (nuevoEstado == EstadoPago.PAGADO) {
+            if (trabajo.getFechaVencimiento().isBefore(LocalDate.now())) {
+                registrarPagoVencido(trabajo);
+            } else {
+                registrarPagoNormal(trabajo);
+            }
+        } else {
+            // Solo permitir cambiar a PENDIENTE o VENCIDO si no está pagado
+            trabajo.setEstadoPago(nuevoEstado);
+        }
+
         return trabajoMapper.toDTO(trabajoRepository.save(trabajo));
     }
+
 
 
     @Override
@@ -185,6 +183,16 @@ public class TrabajoServiceImpl implements TrabajoService {
         }
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<TrabajoDTO> listarTrabajosVencidos() {
+        return trabajoRepository.findByEstadoPago(EstadoPago.PENDIENTE).stream()
+                .filter(t -> t.getFechaVencimiento().isBefore(LocalDate.now()))
+                .map(trabajoMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+
     private void validarMontoPago(Trabajo trabajo, BigDecimal monto) {
         if (monto == null || monto.compareTo(BigDecimal.ZERO) <= 0) {
             throw new BusinessException("El monto del pago debe ser mayor que cero");
@@ -207,7 +215,6 @@ public class TrabajoServiceImpl implements TrabajoService {
 
         trabajo.setEstadoPago(EstadoPago.PAGADO);
         trabajo.setFechaPago(LocalDate.now());
-        trabajo.setNotas("Pago registrado después de vencimiento - " + LocalDate.now());
     }
 
     private void actualizarEstadoSiCompletamentePagado(Trabajo trabajo) {
@@ -218,4 +225,17 @@ public class TrabajoServiceImpl implements TrabajoService {
             trabajoRepository.save(trabajo);
         }
     }
+
+    private void registrarPagoNormal(Trabajo trabajo) {
+        Pago pago = new Pago();
+        pago.setMonto(trabajo.getMonto());
+        pago.setFechaPago(LocalDate.now());
+        pago.setTrabajo(trabajo);
+        pagoRepository.save(pago);
+
+        trabajo.setEstadoPago(EstadoPago.PAGADO);
+        trabajo.setFechaPago(LocalDate.now());
+    }
+
+
 }

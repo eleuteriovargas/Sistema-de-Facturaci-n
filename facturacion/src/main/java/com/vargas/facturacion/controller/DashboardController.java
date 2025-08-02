@@ -9,7 +9,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -19,16 +22,35 @@ public class DashboardController {
 
     @GetMapping("/")
     public String mostrarDashboard(Model model) {
-        List<TrabajoDTO> pendientes = trabajoService.listarTrabajosPorEstado(EstadoPago.PENDIENTE);
+        // Obtener trabajos pendientes no vencidos
+        List<TrabajoDTO> pendientes = trabajoService.listarTrabajosPorEstado(EstadoPago.PENDIENTE)
+                .stream()
+                .filter(t -> t.getFechaVencimiento().isAfter(LocalDate.now()) ||
+                        t.getFechaVencimiento().isEqual(LocalDate.now()))
+                .collect(Collectors.toList());
 
-        // Asegurar que los montos no sean nulos
-        pendientes.forEach(t -> {
-            if (t.getMonto() == null) {
-                t.setMonto(BigDecimal.ZERO);
-            }
-        });
+        List<TrabajoDTO> vencidos = new ArrayList<>();
+
+        // Trabajos con estado VENCIDO explícito
+        vencidos.addAll(trabajoService.listarTrabajosPorEstado(EstadoPago.VENCIDO));
+
+        // Trabajos pendientes con fecha vencida (por si no se actualizó el estado)
+        vencidos.addAll(trabajoService.listarTrabajosPorEstado(EstadoPago.PENDIENTE)
+                .stream()
+                .filter(t -> t.getFechaVencimiento().isBefore(LocalDate.now()))
+                .collect(Collectors.toList()));
+
+        // Eliminar duplicados (por si algún trabajo aparece en ambas consultas)
+        vencidos = vencidos.stream()
+                .distinct()
+                .collect(Collectors.toList());
+
+        // Asegurar montos no nulos
+        pendientes.forEach(t -> t.setMonto(t.getMonto() != null ? t.getMonto() : BigDecimal.ZERO));
+        vencidos.forEach(t -> t.setMonto(t.getMonto() != null ? t.getMonto() : BigDecimal.ZERO));
 
         model.addAttribute("pendientes", pendientes);
+        model.addAttribute("vencidos", vencidos);
         return "dashboard";
     }
 }

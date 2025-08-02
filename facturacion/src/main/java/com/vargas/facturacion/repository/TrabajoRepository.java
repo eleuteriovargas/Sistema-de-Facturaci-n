@@ -40,4 +40,9 @@ public interface TrabajoRepository extends JpaRepository<Trabajo, Long> {
     @Query("SELECT t FROM Trabajo t WHERE t.id = :id")
     Optional<Trabajo> findByIdWithLock(@Param("id") Long id);
 
+    @Query("SELECT t FROM Trabajo t WHERE t.estadoPago = :estado AND t.fechaVencimiento < CURRENT_DATE")
+    List<Trabajo> findVencidos(@Param("estado") EstadoPago estado);
+
+    List<Trabajo> findByEstadoPagoAndFechaVencimientoBefore(EstadoPago estado, LocalDate fecha);
+
 }
