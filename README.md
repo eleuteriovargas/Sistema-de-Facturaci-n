@@ -14,11 +14,10 @@ Este es un sistema empresarial desarrollado con **Java Spring Boot** que permite
 
 | Fase | Descripción | Estado |
 |------|-------------|--------|
-| 1️⃣ Fase 1 | Registro de clientes, trabajos y control del estado de cobro (pendiente, pagado, vencido). | ✅ En desarrollo |
+| 1️⃣ Fase 1 | Registro de clientes, trabajos y control del estado de cobro (pendiente, pagado, vencido) y Dashboard ejecutivo con métricas financieras, gráficas interactivas, filtros avanzados. | ✅ En desarrollo |
 | 2️⃣ Fase 2 | Reportes básicos, alertas por trabajos vencidos, exportación a PDF/Excel. | 🕐 Próximamente |
 | 3️⃣ Fase 3 | Generación de facturas (PDF/XML), integración con CFDI (México), módulo de pagos. | 🔒 Planeado |
 | 4️⃣ Fase 4 | Seguridad con roles (Administrador, Capturista), autenticación y autorización. | 🔒 Planeado |
-| 5️⃣ Fase 5 | Dashboard ejecutivo con métricas financieras, gráficas interactivas, filtros avanzados. | 🔒 Planeado |
 
 ---
 
@@ -32,7 +31,7 @@ Este es un sistema empresarial desarrollado con **Java Spring Boot** que permite
 - **MySQL**
 - **Lombok**
 - **Maven**
-
+- **IA**
 ---
 
 ## 🏗️ Arquitectura del proyecto
@@ -111,7 +110,6 @@ http://localhost:8080/trabajos
 - Reportes de ingresos y deudas
 - Seguridad con roles
 - Integración con timbrado CFDI
-- Gráficas y dashboard ejecutivo
 
 ---
 
@@ -131,11 +129,13 @@ Ejemplos:
 ## 📞 Contacto del desarrollador
 
 Desarrollado por **Francisco Vargas**  
-📧 Email: [coloca aquí tu correo si quieres]  
-🚀 GitHub: [coloca aquí tu perfil si ya lo tienes público]
+📧 Email: eleute_@hotmail.com 
+
 
 ---
 
 ## 📃 Licencia
 
 Este proyecto es de código privado en desarrollo. Su uso o distribución queda sujeto a los términos que el desarrollador defina posteriormente.
+=======
+
