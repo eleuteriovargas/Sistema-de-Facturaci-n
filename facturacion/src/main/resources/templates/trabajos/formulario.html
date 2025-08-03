@@ -1,122 +1,163 @@
-
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Lista de Trabajos</title>
+    <title>Nuevo Trabajo</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .form-section {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .form-header {
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        .btn-custom {
+            transition: all 0.3s ease;
+        }
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+        }
+    </style>
 </head>
-<body>
 
-<div class="col-12 mt-3">
-    <div class="d-flex gap-2">
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-save"></i> Guardar
-        </button>
-        <a href="/" class="btn btn-info text-white">
-            <i class="bi bi-house-door"></i> Inicio
-        </a>
-        <a th:href="@{/trabajos}" class="btn btn-secondary">
-            <i class="bi bi-x-circle"></i> Cancelar
-        </a>
-    </div>
-</div>
-
-<div class="container mt-4">
-    <h1 class="mb-4">Nuevo Trabajo</h1> <!-- Simplificado -->
-
-    <!-- Formulario corregido -->
-    <form th:action="@{/trabajos}" method="post" th:object="${trabajo}">
-        <div class="row g-3">
-            <!-- Descripción -->
-            <div class="col-md-12">
-                <label for="descripcion" class="form-label">Descripción</label>
-                <input type="text" class="form-control" id="descripcion"
-                       th:field="*{descripcion}" placeholder="Descripción del trabajo">
-                <small class="text-danger" th:if="${#fields.hasErrors('descripcion')}"
-                       th:errors="*{descripcion}"></small>
-            </div>
-
-
-            <!-- En formulario.html (dentro de trabajos), cerca del campo de selección de cliente -->
-            <div class="col-md-6">
-                <div class="d-flex justify-content-between align-items-center">
-                    <label for="clienteId" class="form-label">Cliente</label>
-                    <a href="/clientes/nuevo" class="btn btn-sm btn-outline-primary">
-                        <i class="bi bi-person-plus"></i> Nuevo Cliente
-                    </a>
-                </div>
-                <select class="form-select" id="clienteId" th:field="*{clienteId}" required>
-                    <option value="">Seleccione un cliente</option>
-                    <option th:each="cliente : ${clientes}"
-                            th:value="${cliente.id}"
-                            th:text="${cliente.nombre}">
-                    </option>
-                </select>
-            </div>
-
-
-            <!-- Monto -->
-            <div class="col-md-6">
-                <label for="monto" class="form-label">Monto</label>
-                <div class="input-group">
-                    <span class="input-group-text">$</span>
-                    <input type="number" step="0.01" class="form-control" id="monto"
-                           th:field="*{monto}" placeholder="0.00" min="0.01">
-                </div>
-                <small class="text-danger" th:if="${#fields.hasErrors('monto')}"
-                       th:errors="*{monto}"></small>
-            </div>
-
-            <!-- Estado de Pago (simplificado) -->
-            <div class="col-md-6">
-                <label for="estadoPago" class="form-label">Estado de Pago</label>
-                <select class="form-select" id="estadoPago" th:field="*{estadoPago}">
-                    <option th:each="estado : ${T(com.vargas.facturacion.model.enums.EstadoPago).values()}"
-                            th:value="${estado}"
-                            th:text="${estado.descripcion}">
-                    </option>
-                </select>
-            </div>
-
-            <!-- Fechas -->
-            <div class="col-md-6">
-                <label for="fechaTrabajo" class="form-label">Fecha de Trabajo</label>
-                <input type="date" class="form-control" id="fechaTrabajo" th:field="*{fechaTrabajo}">
-            </div>
-
-            <div class="col-md-6">
-                <label for="fechaVencimiento" class="form-label">Fecha de Vencimiento</label>
-                <input type="date" class="form-control" id="fechaVencimiento" th:field="*{fechaVencimiento}">
-            </div>
-
-            <!-- Cliente -->
-            <div class="col-md-6">
-                <label for="clienteId" class="form-label">Cliente</label>
-                <select class="form-select" id="clienteId" th:field="*{clienteId}" required>
-                    <option value="">Seleccione un cliente</option>
-                    <option th:each="cliente : ${clientes}"
-                            th:value="${cliente.id}"
-                            th:text="${cliente.nombre}">
-                    </option>
-                </select>
-            </div>
-
-            <!-- Botones -->
-            <div class="col-12 mt-3">
-                <button type="submit" class="btn btn-primary me-2">
-                    <i class="bi bi-save"></i> Guardar
-                </button>
-                <a th:href="@{/trabajos}" class="btn btn-secondary">
+<body class="bg-light">
+<div class="container-fluid bg-white shadow-sm py-2">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 text-primary">
+                <i class="bi bi-briefcase me-2"></i>Sistema de Trabajos
+            </h4>
+            <div class="d-flex gap-2">
+                <a href="/" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-house-door"></i> Inicio
+                </a>
+                <a th:href="@{/trabajos}" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-x-circle"></i> Cancelar
                 </a>
             </div>
         </div>
-    </form>
+    </div>
 </div>
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-file-earmark-plus me-2"></i>Nuevo Trabajo</h4>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/trabajos}" method="post" th:object="${trabajo}">
+                        <div class="row g-3">
+                            <!-- Información Básica -->
+                            <div class="col-12">
+                                <div class="form-section">
+                                    <h5 class="form-header"><i class="bi bi-info-circle me-2"></i>Información del Trabajo</h5>
+                                    <div class="mb-3">
+                                        <label for="descripcion" class="form-label required-field">Descripción</label>
+                                        <input type="text" class="form-control" id="descripcion"
+                                               th:field="*{descripcion}" placeholder="Descripción detallada del trabajo" required>
+                                        <small class="text-danger" th:if="${#fields.hasErrors('descripcion')}"
+                                               th:errors="*{descripcion}"></small>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="monto" class="form-label required-field">Monto</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" step="0.01" class="form-control" id="monto"
+                                                       th:field="*{monto}" placeholder="0.00" min="0.01" required>
+                                            </div>
+                                            <small class="text-danger" th:if="${#fields.hasErrors('monto')}"
+                                                   th:errors="*{monto}"></small>
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <label for="estadoPago" class="form-label required-field">Estado de Pago</label>
+                                            <select class="form-select" id="estadoPago" th:field="*{estadoPago}" required>
+                                                <option th:each="estado : ${T(com.vargas.facturacion.model.enums.EstadoPago).values()}"
+                                                        th:value="${estado}"
+                                                        th:text="${estado.descripcion}">
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Información del Cliente -->
+                            <div class="col-12">
+                                <div class="form-section">
+                                    <h5 class="form-header"><i class="bi bi-person me-2"></i>Información del Cliente</h5>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <label for="clienteId" class="form-label required-field">Cliente</label>
+                                            <a href="/clientes/nuevo" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-person-plus"></i> Nuevo Cliente
+                                            </a>
+                                        </div>
+                                        <select class="form-select" id="clienteId" th:field="*{clienteId}" required>
+                                            <option value="">Seleccione un cliente</option>
+                                            <option th:each="cliente : ${clientes}"
+                                                    th:value="${cliente.id}"
+                                                    th:text="${cliente.nombre}">
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Fechas -->
+                            <div class="col-12">
+                                <div class="form-section">
+                                    <h5 class="form-header"><i class="bi bi-calendar me-2"></i>Fechas</h5>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="fechaTrabajo" class="form-label">Fecha de Trabajo</label>
+                                            <input type="date" class="form-control" id="fechaTrabajo" th:field="*{fechaTrabajo}">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="fechaVencimiento" class="form-label">Fecha de Vencimiento</label>
+                                            <input type="date" class="form-control" id="fechaVencimiento" th:field="*{fechaVencimiento}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botones -->
+                            <div class="col-12 mt-4">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a th:href="@{/trabajos}" class="btn btn-lg btn-outline-secondary btn-custom">
+                                        <i class="bi bi-x-circle"></i> Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-lg btn-primary btn-custom">
+                                        <i class="bi bi-save"></i> Guardar Trabajo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

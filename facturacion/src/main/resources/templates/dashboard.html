@@ -8,162 +8,334 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
         :root {
-            --bs-primary-rgb: 13, 110, 253;
-            --bs-warning-rgb: 255, 193, 7;
-            --bs-info-rgb: 23, 162, 184;
+            --primary-color: #4e73df;
+            --secondary-color: #858796;
+            --success-color: #1cc88a;
+            --info-color: #36b9cc;
+            --warning-color: #f6c23e;
+            --danger-color: #e74a3b;
+            --light-color: #f8f9fc;
+            --dark-color: #5a5c69;
+        }
+
+        body {
+            background-color: #f8f9fc;
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #224abe 100%);
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            color: white;
         }
 
         .card {
-            margin-bottom: 20px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             border: none;
-            border-radius: 10px;
+            border-radius: 0.35rem;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
         }
 
         .card-header {
+            background-color: var(--primary-color);
+            border-bottom: none;
             font-weight: 600;
-            border-radius: 10px 10px 0 0 !important;
+            color: white;
+            border-radius: 0.35rem 0.35rem 0 0 !important;
         }
 
         .work-item {
             transition: all 0.3s ease;
+            border-left: 4px solid transparent;
         }
 
         .work-item:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
         }
 
-        .status-badge {
-            font-size: 0.85rem;
-            padding: 0.35em 0.65em;
+        .pending-header {
+            background-color: #FFF3CD;
+            border-left: 4px solid #FFC107 !important;
+            color: #856404;
         }
 
-        .summary-value {
-            font-size: 1.25rem;
-            font-weight: 500;
+        .overdue-header {
+            background-color: #F8D7DA;
+            border-left: 4px solid #DC3545 !important;
+            color: #721C24;
+        }
+
+        .section-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .pagination .page-link {
+            color: var(--primary-color);
+        }
+
+        .stat-card {
+            border-left: 0.25rem solid;
+        }
+
+        .stat-card.pending {
+            border-left-color: var(--warning-color);
+        }
+
+        .stat-card.overdue {
+            border-left-color: var(--danger-color);
+        }
+
+        .icon-circle {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
         }
     </style>
 </head>
-<body class="bg-light">
-<div class="container mt-4">
-    <!-- Encabezado -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0">
-            <i class="bi bi-speedometer2 text-primary"></i> Dashboard
-        </h1>
-        <div class="d-flex gap-2">
-            <a href="/" class="btn btn-outline-primary">
-                <i class="bi bi-house-door"></i> Inicio
-            </a>
-            <a href="/trabajos" class="btn btn-primary">
-                <i class="bi bi-list-ul"></i> Ver Todos
-            </a>
+
+<body>
+<!-- Encabezado del Dashboard -->
+<div class="dashboard-header py-4 mb-4">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h3 mb-0">
+                    <i class="bi bi-speedometer2"></i> Panel de Control
+                </h1>
+                <p class="mb-0">Resumen de actividades y estado financiero</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="/" class="btn btn-outline-light">
+                    <i class="bi bi-house-door"></i> Inicio
+                </a>
+                <a href="/trabajos" class="btn btn-light text-primary">
+                    <i class="bi bi-list-ul"></i> Ver Todos
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Tarjetas de Resumen -->
+    <div class="row mb-4">
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card stat-card pending h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="text-uppercase text-muted mb-2">Pendientes</h6>
+                            <h2 class="mb-0" th:text="${pendientes.size()}">0</h2>
+                        </div>
+                        <div class="col-auto">
+                            <div class="icon-circle bg-warning text-white">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="mt-3 mb-0 text-muted text-sm">
+                            <span class="text-warning me-2">
+                                <i class="bi bi-currency-dollar"></i>
+                                <span th:text="${#numbers.formatCurrency(#aggregates.sum(pendientes.![monto]))}"></span>
+                            </span>
+                        <span class="text-nowrap">Total pendiente</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card stat-card overdue h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="text-uppercase text-muted mb-2">Vencidos</h6>
+                            <h2 class="mb-0" th:text="${vencidos.size()}">0</h2>
+                        </div>
+                        <div class="col-auto">
+                            <div class="icon-circle bg-danger text-white">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="mt-3 mb-0 text-muted text-sm">
+                            <span class="text-danger me-2">
+                                <i class="bi bi-currency-dollar"></i>
+                                <span th:text="${#numbers.formatCurrency(#aggregates.sum(vencidos.![monto]))}"></span>
+                            </span>
+                        <span class="text-nowrap">Total vencido</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card stat-card h-100" style="border-left-color: var(--primary-color);">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="text-uppercase text-muted mb-2">Acciones</h6>
+                            <h2 class="mb-0">+</h2>
+                        </div>
+                        <div class="col-auto">
+                            <div class="icon-circle bg-primary text-white">
+                                <i class="bi bi-lightning-charge"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <a href="/trabajos/nuevo" class="btn btn-sm btn-primary">
+                            <i class="bi bi-plus-circle"></i> Nuevo Trabajo
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="row">
-        <!-- Columna izquierda - Listado de pendientes y vencidos -->
-        <div class="col-lg-7">
-            <!-- Sección de Trabajos Pendientes -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-warning text-dark">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-exclamation-triangle"></i> Trabajos Pendientes
-                        </h5>
-                        <span class="badge bg-white text-dark">
-                            <span th:text="${pendientes.size()}"></span> registros
-                        </span>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div th:if="${pendientes.empty}" class="alert alert-info mb-0">
-                        <i class="bi bi-check-circle-fill"></i> ¡Felicidades! No hay trabajos pendientes
-                    </div>
-
-                    <div th:each="trabajo : ${pendientes}" class="mb-3 p-3 work-item bg-white rounded shadow-sm">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h6 class="fw-bold mb-1" th:text="${trabajo.clienteNombre}"></h6>
-                                <p class="mb-2 text-muted" th:text="${trabajo.descripcion}"></p>
-
-                                <div class="d-flex gap-3">
-                                    <div>
-                                        <span class="text-muted small">Monto:</span>
-                                        <span th:text="${#numbers.formatCurrency(trabajo.monto)}"
-                                              class="fw-bold d-block"></span>
-                                    </div>
-                                    <div>
-                                        <span class="text-muted small">Vence:</span>
-                                        <span th:text="${#temporals.format(trabajo.fechaVencimiento, 'dd/MM/yyyy')}"
-                                              th:class="${trabajo.fechaVencimiento.isBefore(T(java.time.LocalDate).now())} ?
-                                                  'text-danger fw-bold' : 'text-primary fw-bold'"
-                                              class="d-block"></span>
-                                    </div>
-                                </div>
-                            </div>
-                            <a th:href="@{'/trabajos/' + ${trabajo.id} + '/pagar'}"
-                               class="btn btn-sm btn-success align-self-center">
-                                <i class="bi bi-cash-coin"></i> Pagar
+        <!-- Columna izquierda - Listado de trabajos -->
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#pendientes">
+                                <i class="bi bi-clock-history me-1"></i> Pendientes
                             </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#vencidos">
+                                <i class="bi bi-exclamation-triangle me-1"></i> Vencidos
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body p-0">
+                    <div class="tab-content">
+                        <!-- Pestaña de Pendientes - Resaltada con color amarillo/naranja -->
+                        <div class="tab-pane fade show active" id="pendientes">
+                            <div class="alert pending-header border-0 rounded-0 mb-0 d-flex align-items-center p-3">
+                                <i class="bi bi-exclamation-triangle-fill me-2 fs-4"></i>
+                                <h4 class="mb-0 fw-bold section-title">Pendientes</h4>
+                            </div>
+
+                            <div th:if="${pendientes.empty}" class="alert alert-info mb-0 m-3">
+                                <i class="bi bi-check-circle-fill"></i> ¡Felicidades! No hay trabajos pendientes
+                            </div>
+
+                            <div th:each="trabajo : ${pendientes}" class="mb-3 p-3 work-item bg-white">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="fw-bold mb-1" th:text="${trabajo.clienteNombre}"></h6>
+                                        <p class="mb-2 text-muted small" th:text="${trabajo.descripcion}"></p>
+
+                                        <div class="d-flex gap-3">
+                                            <div>
+                                                <span class="text-muted small">Monto:</span>
+                                                <span th:text="${#numbers.formatCurrency(trabajo.monto)}"
+                                                      class="fw-bold d-block text-warning"></span>
+                                            </div>
+                                            <div>
+                                                <span class="text-muted small">Vence:</span>
+                                                <span th:text="${#temporals.format(trabajo.fechaVencimiento, 'dd/MM/yyyy')}"
+                                                      th:class="${trabajo.fechaVencimiento.isBefore(T(java.time.LocalDate).now())} ?
+                                                              'text-danger fw-bold' : 'text-primary fw-bold'"
+                                                      class="d-block"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <a th:href="@{'/trabajos/' + ${trabajo.id} + '/pagar'}"
+                                       class="btn btn-sm btn-warning align-self-center">
+                                        <i class="bi bi-cash-coin"></i> Pagar
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Paginación para pendientes -->
+                            <nav th:if="${pendientes.size() > 5}" aria-label="Paginación pendientes" class="m-3">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#" tabindex="-1">Anterior</a>
+                                    </li>
+                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#">Siguiente</a>
+                                    </li>
+                                </ul>
+                            </nav>
                         </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Sección de Trabajos Vencidos -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-danger text-white">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-clock-history"></i> Trabajos Vencidos
-                            <span class="badge bg-white text-danger ms-2" th:text="${vencidos.size()}"></span>
-                        </h5>
-                        <span class="badge bg-white text-danger">
-                            <span th:text="${#numbers.formatCurrency(#aggregates.sum(vencidos.![monto]))}"></span> total
-                        </span>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div th:if="${vencidos.empty}" class="alert alert-success mb-0">
-                        <i class="bi bi-check-circle-fill"></i> ¡Excelente! No hay trabajos vencidos
-                    </div>
+                        <!-- Pestaña de Vencidos - Resaltada con color rojo -->
+                        <div class="tab-pane fade" id="vencidos">
+                            <div class="alert overdue-header border-0 rounded-0 mb-0 d-flex align-items-center p-3">
+                                <i class="bi bi-exclamation-octagon-fill me-2 fs-4"></i>
+                                <h4 class="mb-0 fw-bold section-title">Vencidos</h4>
+                            </div>
 
-                    <div th:each="trabajo : ${vencidos}" class="mb-3 p-3 work-item bg-white rounded shadow-sm border-start border-4 border-danger">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h6 class="fw-bold mb-1" th:text="${trabajo.clienteNombre}"></h6>
-                                <p class="mb-2 text-muted" th:text="${trabajo.descripcion}"></p>
+                            <div th:if="${vencidos.empty}" class="alert alert-success mb-0 m-3">
+                                <i class="bi bi-check-circle-fill"></i> ¡Excelente! No hay trabajos vencidos
+                            </div>
 
-                                <div class="d-flex gap-3">
+                            <div th:each="trabajo : ${vencidos}" class="mb-3 p-3 work-item bg-white border-start border-danger">
+                                <div class="d-flex justify-content-between align-items-start">
                                     <div>
-                                        <span class="text-muted small">Monto:</span>
-                                        <span th:text="${#numbers.formatCurrency(trabajo.monto)}"
-                                              class="fw-bold d-block text-danger"></span>
+                                        <h6 class="fw-bold mb-1" th:text="${trabajo.clienteNombre}"></h6>
+                                        <p class="mb-2 text-muted small" th:text="${trabajo.descripcion}"></p>
+
+                                        <div class="d-flex gap-3">
+                                            <div>
+                                                <span class="text-muted small">Monto:</span>
+                                                <span th:text="${#numbers.formatCurrency(trabajo.monto)}"
+                                                      class="fw-bold d-block text-danger"></span>
+                                            </div>
+                                            <div>
+                                                <span class="text-muted small">Vencido desde:</span>
+                                                <span th:text="${#temporals.format(trabajo.fechaVencimiento, 'dd/MM/yyyy')}"
+                                                      class="fw-bold d-block text-danger"></span>
+                                            </div>
+                                            <div>
+                                                <span class="text-muted small">Días:</span>
+                                                <span th:text="${T(java.time.Period).between(trabajo.fechaVencimiento, T(java.time.LocalDate).now()).getDays()}"
+                                                      class="fw-bold d-block text-danger"></span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <span class="text-muted small">Vencido desde:</span>
-                                        <span th:text="${#temporals.format(trabajo.fechaVencimiento, 'dd/MM/yyyy')}"
-                                              class="fw-bold d-block text-danger"></span>
-                                    </div>
-                                    <div>
-                                        <span class="text-muted small">Días:</span>
-                                        <span th:text="${T(java.time.Period).between(trabajo.fechaVencimiento, T(java.time.LocalDate).now()).getDays()}"
-                                              class="fw-bold d-block text-danger"></span>
+                                    <div class="d-flex flex-column gap-2">
+                                        <a th:href="@{'/trabajos/' + ${trabajo.id} + '/pagar'}"
+                                           class="btn btn-sm btn-danger">
+                                            <i class="bi bi-exclamation-triangle"></i> Regularizar
+                                        </a>
                                     </div>
                                 </div>
                             </div>
-                            <div class="d-flex flex-column gap-2">
-                                <a th:href="@{'/trabajos/' + ${trabajo.id} + '/pagar'}"
-                                   class="btn btn-sm btn-danger">
-                                    <i class="bi bi-exclamation-triangle"></i> Regularizar
-                                </a>
-                                <a th:href="@{'/trabajos/' + ${trabajo.id}}"
-                                   class="btn btn-sm btn-outline-secondary">
-                                    <i class="bi bi-eye"></i> Detalles
-                                </a>
-                            </div>
+
+                            <!-- Paginación para vencidos -->
+                            <nav th:if="${vencidos.size() > 5}" aria-label="Paginación vencidos" class="m-3">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#" tabindex="-1">Anterior</a>
+                                    </li>
+                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#">Siguiente</a>
+                                    </li>
+                                </ul>
+                            </nav>
                         </div>
                     </div>
                 </div>
@@ -171,10 +343,10 @@
         </div>
 
         <!-- Columna derecha - Acciones y resumen -->
-        <div class="col-lg-5">
+        <div class="col-lg-4">
             <!-- Tarjeta de Acciones Rápidas -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-primary text-white">
+            <div class="card mb-4">
+                <div class="card-header">
                     <h5 class="card-title mb-0">
                         <i class="bi bi-lightning-charge"></i> Acciones Rápidas
                     </h5>
@@ -187,63 +359,39 @@
                         <a href="/trabajos" class="btn btn-primary">
                             <i class="bi bi-list-ul"></i> Ver Todos los Trabajos
                         </a>
-                        <a href="/" class="btn btn-info text-white">
-                            <i class="bi bi-house-door"></i> Volver al Inicio
+                        <a href="/clientes" class="btn btn-info text-white">
+                            <i class="bi bi-people"></i> Ver Clientes
                         </a>
                     </div>
                 </div>
             </div>
 
-            <!-- Tarjeta de Resumen -->
-            <div class="card border-0 shadow-sm mt-4">
-                <div class="card-header bg-info text-white">
+            <!-- Tarjeta de Resumen Financiero -->
+            <div class="card">
+                <div class="card-header">
                     <h5 class="card-title mb-0">
                         <i class="bi bi-graph-up"></i> Resumen Financiero
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted">Trabajos pendientes:</span>
-                            <span th:text="${pendientes.size()}"
-                                  class="badge bg-warning text-dark status-badge"></span>
-                        </div>
+                    <div class="chart-pie mb-4">
+                        <canvas id="myPieChart" height="200"></canvas>
                     </div>
 
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted">Total pendiente:</span>
-                            <span th:text="${#numbers.formatCurrency(#aggregates.sum(pendientes.![monto]))}"
-                                  class="summary-value text-warning"></span>
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                            <div>
+                                <i class="bi bi-circle-fill text-warning me-2"></i>
+                                <span>Pendientes</span>
+                            </div>
+                            <span th:text="${pendientes.size()}" class="badge bg-warning text-dark"></span>
                         </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted">Trabajos vencidos:</span>
-                            <span th:text="${vencidos.size()}"
-                                  class="badge bg-danger text-white status-badge"></span>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted">Total vencido:</span>
-                            <span th:text="${#numbers.formatCurrency(#aggregates.sum(vencidos.![monto]))}"
-                                  class="summary-value text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="progress mt-2" style="height: 8px;">
-                        <div th:with="total=${pendientes.size() + vencidos.size()},
-                                     percentPendientes=${total == 0 ? 0 : (pendientes.size() * 100 / total)}"
-                             class="progress-bar bg-warning" role="progressbar"
-                             th:style="'width: ' + ${percentPendientes} + '%'">
-                        </div>
-                        <div th:with="total=${pendientes.size() + vencidos.size()},
-                                     percentVencidos=${total == 0 ? 0 : (vencidos.size() * 100 / total)}"
-                             class="progress-bar bg-danger" role="progressbar"
-                             th:style="'width: ' + ${percentVencidos} + '%'">
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                            <div>
+                                <i class="bi bi-circle-fill text-danger me-2"></i>
+                                <span>Vencidos</span>
+                            </div>
+                            <span th:text="${vencidos.size()}" class="badge bg-danger text-white"></span>
                         </div>
                     </div>
 
@@ -261,6 +409,48 @@
     </div>
 </div>
 
+<!-- Footer -->
+<footer class="sticky-footer bg-white mt-5 py-3">
+    <div class="container my-auto">
+        <div class="copyright text-center my-auto">
+            <span>Copyright &copy; Sistema de Facturación <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy')}"></span></span>
+        </div>
+    </div>
+</footer>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Gráfico de pastel
+    document.addEventListener('DOMContentLoaded', function() {
+        var ctx = document.getElementById('myPieChart');
+        if (ctx) {
+            var myPieChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pendientes', 'Vencidos'],
+                    datasets: [{
+                        data: [
+                            [[${pendientes.size()}]],
+                            [[${vencidos.size()}]]
+                        ],
+                        backgroundColor: ['#f6c23e', '#e74a3b'],
+                        hoverBackgroundColor: ['#f8d369', '#ea6759'],
+                        hoverBorderColor: "rgba(234, 236, 244, 1)",
+                    }],
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    },
+                    cutout: '70%',
+                },
+            });
+        }
+    });
+</script>
 </body>
 </html>

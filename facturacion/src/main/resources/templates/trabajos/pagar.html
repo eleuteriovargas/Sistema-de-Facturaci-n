@@ -5,30 +5,182 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Registrar Pago</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-<div class="container mt-4">
-    <h1>Registrar Pago</h1>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #858796;
+            --success-color: #1cc88a;
+            --danger-color: #e74a3b;
+            --light-color: #f8f9fc;
+            --dark-color: #5a5c69;
+        }
 
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 th:text="${trabajo.descripcion}"></h5>
-            <p>Cliente: <span th:text="${trabajo.clienteNombre}"></span></p>
-            <p>Monto total: <span th:text="${#numbers.formatCurrency(trabajo.monto)}"></span></p>
-            <p>Pagado: <span th:text="${#numbers.formatCurrency(pagado)}"></span></p>
-            <p>Pendiente: <span th:text="${#numbers.formatCurrency(trabajo.monto - pagado)}"></span></p>
+        body {
+            background-color: #f8f9fc;
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .payment-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #224abe 100%);
+            color: white;
+        }
+
+        .payment-card {
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        }
+
+        .payment-summary {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .amount-input {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .btn-payment {
+            transition: all 0.3s ease;
+            padding: 0.5rem 1.5rem;
+        }
+
+        .btn-payment:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+            font-weight: 600;
+        }
+
+        .summary-label {
+            color: var(--dark-color);
+        }
+
+        .summary-value {
+            font-weight: 500;
+        }
+
+        .pending-amount {
+            color: var(--danger-color);
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body>
+<!-- Encabezado -->
+<div class="payment-header py-3 mb-4 shadow-sm">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="h4 mb-0">
+                <i class="bi bi-cash-coin me-2"></i> Registrar Pago
+            </h1>
+            <div class="d-flex gap-2">
+                <a href="/" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-house-door"></i> Inicio
+                </a>
+                <a th:href="@{/trabajos}" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </a>
+            </div>
         </div>
     </div>
-
-    <form th:action="@{'/trabajos/' + ${trabajo.id} + '/pagos'}" method="post">
-        <div class="mb-3">
-            <label for="monto" class="form-label">Monto a pagar</label>
-            <input type="number" step="0.01" class="form-control" id="monto"
-                   name="monto" th:max="${trabajo.monto - pagado}" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Registrar Pago</button>
-        <a th:href="@{'/trabajos'}" class="btn btn-secondary">Cancelar</a>
-    </form>
 </div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Resumen del trabajo -->
+            <div class="card payment-card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-text me-2"></i> Detalles del Trabajo
+                    </h5>
+                </div>
+                <div class="card-body payment-summary">
+                    <h5 class="mb-3" th:text="${trabajo.descripcion}"></h5>
+
+                    <div class="summary-item">
+                        <span class="summary-label">Cliente:</span>
+                        <span class="summary-value" th:text="${trabajo.clienteNombre}"></span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Monto total:</span>
+                        <span class="summary-value" th:text="${#numbers.formatCurrency(trabajo.monto)}"></span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Pagado:</span>
+                        <span class="summary-value" th:text="${#numbers.formatCurrency(pagado)}"></span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Pendiente:</span>
+                        <span class="summary-value pending-amount"
+                              th:text="${#numbers.formatCurrency(trabajo.monto - pagado)}">
+                            </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario de pago -->
+            <div class="card payment-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-credit-card me-2"></i> Información del Pago
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{'/trabajos/' + ${trabajo.id} + '/pagos'}" method="post">
+                        <div class="mb-4">
+                            <label for="monto" class="form-label fw-bold">Monto a pagar</label>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">$</span>
+                                <input type="number" step="0.01" class="form-control amount-input" id="monto"
+                                       name="monto" th:max="${trabajo.monto - pagado}" required
+                                       placeholder="0.00" th:attr="max=${trabajo.monto - pagado}">
+                            </div>
+                            <small class="text-muted">Monto máximo: <span th:text="${#numbers.formatCurrency(trabajo.monto - pagado)}"></span></small>
+                        </div>
+
+                        <div class="d-flex justify-content-between pt-3">
+                            <a th:href="@{'/trabajos'}" class="btn btn-outline-secondary btn-payment">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-payment">
+                                <i class="bi bi-check-circle"></i> Registrar Pago
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Validación del monto máximo
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const montoInput = document.getElementById('monto');
+        const maxMonto = parseFloat(montoInput.getAttribute('th:max'));
+        const monto = parseFloat(montoInput.value);
+
+        if (monto > maxMonto) {
+            e.preventDefault();
+            alert('El monto no puede ser mayor al pendiente: ' + maxMonto.toFixed(2));
+            montoInput.focus();
+        }
+    });
+</script>
 </body>
 </html>
