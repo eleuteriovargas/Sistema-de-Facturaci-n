@@ -22,6 +22,7 @@ public interface TrabajoRepository extends JpaRepository<Trabajo, Long> {
     List<Trabajo> findByEstadoPagoAndClienteId(EstadoPago estado, Long clienteId);
     List<Trabajo> findByClienteId(Long clienteId);
     Page<Trabajo> findByEstadoPago(EstadoPago estado, Pageable pageable);
+    
 
     // Consulta con @Query opcional
     @Query("SELECT t FROM Trabajo t WHERE " +
@@ -43,6 +44,8 @@ public interface TrabajoRepository extends JpaRepository<Trabajo, Long> {
     @Query("SELECT t FROM Trabajo t WHERE t.estadoPago = :estado AND t.fechaVencimiento < CURRENT_DATE")
     List<Trabajo> findVencidos(@Param("estado") EstadoPago estado);
 
-    List<Trabajo> findByEstadoPagoAndFechaVencimientoBefore(EstadoPago estado, LocalDate fecha);
-
+    @Query("SELECT t FROM Trabajo t WHERE t.estadoPago = :estado AND t.fechaVencimiento < :fecha")
+    List<Trabajo> findByEstadoPagoAndFechaVencimientoBefore(
+            @Param("estado") EstadoPago estado,
+            @Param("fecha") LocalDate fecha);
 }

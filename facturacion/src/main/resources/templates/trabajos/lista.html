@@ -57,6 +57,19 @@
     <div class="card-body">
       <form method="get" class="row g-3">
         <div class="col-md-4">
+
+          <div class="d-flex justify-content-end gap-2">
+            <a href="/" class="btn btn-info text-white">
+              <i class="bi bi-house-door"></i> Inicio
+            </a>
+            <a href="/clientes" class="btn btn-secondary">
+              <i class="bi bi-people"></i> Clientes
+            </a>
+            <a href="/trabajos/nuevo" class="btn btn-primary">
+              <i class="bi bi-plus-circle"></i> Nuevo Trabajo
+            </a>
+          </div>
+
           <select name="estado" class="form-select" onchange="this.form.submit()">
             <option value="">Todos los estados</option>
             <option th:each="estado : ${estadosPago}"

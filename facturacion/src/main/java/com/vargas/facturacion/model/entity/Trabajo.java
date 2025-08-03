@@ -1,30 +1,14 @@
 package com.vargas.facturacion.model.entity;
 
 import com.vargas.facturacion.model.enums.EstadoPago;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Data;
-import java.util.ArrayList;
-import java.util.List;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.CascadeType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity
@@ -43,28 +27,66 @@ public class Trabajo {
     private BigDecimal monto;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private EstadoPago estadoPago = EstadoPago.PENDIENTE;
 
     @NotNull(message = "La fecha de trabajo es requerida")
+    @Column(nullable = false)
     private LocalDate fechaTrabajo;
 
     @NotNull(message = "La fecha de vencimiento es requerida")
-    @FutureOrPresent(message = "La fecha de vencimiento debe ser hoy o en el futuro",
-            groups = OnCreate.class) // Solo validar al crear
+    @FutureOrPresent(message = "La fecha de vencimiento debe ser hoy o en el futuro", groups = OnCreate.class)
+    @Column(nullable = false)
     private LocalDate fechaVencimiento;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
+    @Column(length = 500)
     private String notas;
 
-    //@NotNull(message = "La fecha de pago es requerida")
     private LocalDate fechaPago;
 
     @OneToMany(mappedBy = "trabajo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pago> pagos = new ArrayList<>();
 
-    public interface OnCreate {}
+    // Método para marcar como pagado
+    public void marcarComoPagado() {
+        this.estadoPago = EstadoPago.PAGADO;
+        this.fechaPago = LocalDate.now();
+    }
 
+    // Método para marcar como vencido
+    public void marcarComoVencido() {
+        if (this.fechaVencimiento.isBefore(LocalDate.now())) {
+            this.estadoPago = EstadoPago.VENCIDO;
+        }
+    }
+
+    // Método para verificar si está vencido
+    public boolean estaVencido() {
+        return this.fechaVencimiento.isBefore(LocalDate.now())
+                && this.estadoPago != EstadoPago.PAGADO;
+    }
+
+    // Método para agregar pago
+    public void agregarPago(Pago pago) {
+        this.pagos.add(pago);
+        pago.setTrabajo(this);
+
+        // Verificar si está completamente pagado
+        if (calcularTotalPagado().compareTo(this.monto) >= 0) {
+            marcarComoPagado();
+        }
+    }
+
+    // Método para calcular total pagado
+    public BigDecimal calcularTotalPagado() {
+        return this.pagos.stream()
+                .map(Pago::getMonto)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public interface OnCreate {}
 }

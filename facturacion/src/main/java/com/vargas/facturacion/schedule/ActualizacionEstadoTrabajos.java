@@ -17,8 +17,10 @@ public class ActualizacionEstadoTrabajos {
     private final TrabajoRepository trabajoRepository;
 
     @Scheduled(cron = "0 0 0 * * ?") // Se ejecuta cada día a medianoche
-    public void actualizarTrabajosVencidos() {
-        trabajoRepository.findByEstadoPagoAndFechaVencimientoBefore(EstadoPago.PENDIENTE, LocalDate.now())
+    public void actualizarEstadosVencidos() {
+        trabajoRepository.findByEstadoPagoAndFechaVencimientoBefore(
+                        EstadoPago.PENDIENTE,
+                        LocalDate.now())
                 .forEach(trabajo -> {
                     trabajo.setEstadoPago(EstadoPago.VENCIDO);
                     trabajoRepository.save(trabajo);

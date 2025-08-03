@@ -51,16 +51,14 @@ public class TrabajoController {
     @GetMapping("/nuevo")
     public String mostrarFormularioNuevo(Model model) {
         TrabajoDTO trabajo = new TrabajoDTO();
-        trabajo.setEstadoPago(EstadoPago.PENDIENTE); // Establecer valor por defecto
+        trabajo.setEstadoPago(EstadoPago.PENDIENTE);
         trabajo.setFechaTrabajo(LocalDate.now());
         trabajo.setFechaVencimiento(LocalDate.now().plusDays(7));
 
-
         model.addAttribute("trabajo", trabajo);
-        model.addAttribute("clientes", clienteRepository.findAll());
+        model.addAttribute("clientes", clienteService.listarClientes()); // Cambia esto
         return "trabajos/formulario";
     }
-
     @PostMapping
     public String crearTrabajo(
             @Valid @ModelAttribute("trabajo") TrabajoDTO trabajoDTO,

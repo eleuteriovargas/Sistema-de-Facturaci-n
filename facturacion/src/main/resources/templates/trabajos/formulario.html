@@ -40,6 +40,25 @@
                        th:errors="*{descripcion}"></small>
             </div>
 
+
+            <!-- En formulario.html (dentro de trabajos), cerca del campo de selección de cliente -->
+            <div class="col-md-6">
+                <div class="d-flex justify-content-between align-items-center">
+                    <label for="clienteId" class="form-label">Cliente</label>
+                    <a href="/clientes/nuevo" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-person-plus"></i> Nuevo Cliente
+                    </a>
+                </div>
+                <select class="form-select" id="clienteId" th:field="*{clienteId}" required>
+                    <option value="">Seleccione un cliente</option>
+                    <option th:each="cliente : ${clientes}"
+                            th:value="${cliente.id}"
+                            th:text="${cliente.nombre}">
+                    </option>
+                </select>
+            </div>
+
+
             <!-- Monto -->
             <div class="col-md-6">
                 <label for="monto" class="form-label">Monto</label>
