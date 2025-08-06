@@ -1,12 +1,8 @@
-#.gitignore
-
-
-# ❗️Permitir la inclusión del .jar necesario
-!target/
-!target/facturacion-0.0.1-SNAPSHOT.jar
-
-# ❌ Ignorar todo lo demás innecesario
+# Ignorar todo dentro de target, excepto el JAR que vamos a empaquetar
 target/*
+!target/app.jar
+
+# Archivos innecesarios
 *.log
 *.iml
 *.swp
@@ -39,14 +35,9 @@ build/
 .git
 .gitignore
 
-# Maven
+# Maven wrapper
 .mvn/
 .mvn/wrapper/maven-wrapper.jar
 
-# Archivos sensibles
+# Variables sensibles
 .env
-
-echo "facturacion/context.tar.gz"
-echo "facturacion/app.jar"
-
-
