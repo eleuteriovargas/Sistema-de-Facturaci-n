@@ -1,31 +1,28 @@
-#.gitignore
+# ❌ Archivos de entorno (sensibles)
+.env
+*.env
 
-
-# ❗️Permitir la inclusión del .jar necesario
-!target/
-!target/facturacion-0.0.1-SNAPSHOT.jar
-
-# ❌ Ignorar todo lo demás innecesario
-target/*
+# ❌ Logs y archivos temporales
 *.log
-*.iml
 *.swp
 *.swo
+
+# ❌ Claves y certificados
 *.pem
 *.key
 
-# IDEs
+# ❌ Archivos del sistema / IDEs
 .idea/
 .vscode/
+*.iml
 *.iws
 *.ipr
 
-# STS, NetBeans, otros IDEs
-.apt_generated
+# ❌ Archivos específicos de herramientas de desarrollo
 .classpath
 .factorypath
 .project
-.settings
+.settings/
 .springBeans
 .sts4-cache
 /nbproject/private/
@@ -34,19 +31,16 @@ target/*
 /nbdist/
 /.nb-gradle/
 build/
+target/
 
-# Git
-.git
-.gitignore
+# ✅ Permitir un JAR específico si es necesario
+# !target/facturacion-0.0.1-SNAPSHOT.jar
 
-# Maven
+# ❌ Maven wrapper y otros binarios
 .mvn/
 .mvn/wrapper/maven-wrapper.jar
 
-# Archivos sensibles
-.env
-
-echo "facturacion/context.tar.gz"
-echo "facturacion/app.jar"
-
+# ❌ Archivos propios de Git
+.git
+.gitignore
 

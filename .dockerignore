@@ -1,43 +1,33 @@
-# Ignorar todo dentro de target, excepto el JAR que vamos a empaquetar
-target/*
-!target/app.jar
+# ❌ Archivos de entorno sensibles
+.env
+*.env
 
-# Archivos innecesarios
+# ❌ Archivos de log y temporales
 *.log
-*.iml
 *.swp
 *.swo
-*.pem
-*.key
 
-# IDEs
+# ❌ Archivos del sistema / IDEs
 .idea/
 .vscode/
+*.iml
 *.iws
 *.ipr
 
-# STS, NetBeans, otros IDEs
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
+# ❌ Archivos de compilación
+target/
 build/
+dist/
 
-# Git
-.git
-.gitignore
-
-# Maven wrapper
+# ❌ Archivos específicos de Maven
 .mvn/
 .mvn/wrapper/maven-wrapper.jar
 
-# Variables sensibles
-.env
+# ❌ Claves privadas y certificados
+*.pem
+*.key
+
+# ❌ Archivos propios de Git
+.git
+.gitignore
+.dockerignore
